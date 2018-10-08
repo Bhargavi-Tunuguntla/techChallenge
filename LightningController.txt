@@ -1,0 +1,280 @@
+({
+    init : function(component, event, helper) {
+        
+        //alert(component.get("v.Rating"));
+        
+        var action=component.get("c.GetListOfRecords");
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                // if storeResponse size is 0 ,display no record found message on screen.
+                console.log(response.getReturnValue());
+                component.set("v.AccountList",response.getReturnValue());
+            }
+            
+        });
+        $A.enqueueAction(action);
+        
+        
+    },
+    
+    // For count the selected checkboxes. 
+    checkboxSelect: function(component, event, helper) {
+        // get the selected checkbox value  
+        var selectedRec = event.getSource().get("v.value");
+        // get the selectedCount attrbute value(default is 0) for add/less numbers. 
+        var getSelectedNumber = component.get("v.selectedCount");
+        // check, if selected checkbox value is true then increment getSelectedNumber with 1 
+        // else Decrement the getSelectedNumber with 1     
+        if (selectedRec == true) {
+            getSelectedNumber++;
+        } else {
+            getSelectedNumber--;
+        }
+        // set the actual value on selectedCount attribute to show on header part. 
+        component.set("v.selectedCount", getSelectedNumber);
+    },
+    
+    // For select all Checkboxes 
+    selectAll: function(component, event, helper) {
+        //get the header checkbox value  
+        var selectedHeaderCheck = event.getSource().get("v.value");
+        // get all checkbox on table with "boxPack" aura id (all iterate value have same Id)
+        // return the List of all checkboxs element 
+        var getAllId = component.find("boxPack");
+        // If the local ID is unique[in single record case], find() returns the component. not array   
+        if(! Array.isArray(getAllId)){
+            if(selectedHeaderCheck == true){ 
+                component.find("boxPack").set("v.value", true);
+                component.set("v.selectedCount", 1);
+            }else{
+                component.find("boxPack").set("v.value", false);
+                component.set("v.selectedCount", 0);
+            }
+        }else{
+            // check if select all (header checkbox) is true then true all checkboxes on table in a for loop  
+            // and set the all selected checkbox length in selectedCount attribute.
+            // if value is false then make all checkboxes false in else part with play for loop 
+            // and select count as 0 
+            if (selectedHeaderCheck == true) {
+                for (var i = 0; i < getAllId.length; i++) {
+                    component.find("boxPack")[i].set("v.value", true);
+                    component.set("v.selectedCount", getAllId.length);
+                }
+            } else {
+                for (var i = 0; i < getAllId.length; i++) {
+                    component.find("boxPack")[i].set("v.value", false);
+                    component.set("v.selectedCount", 0);
+                }
+            } 
+        }  
+        
+    },
+    EditRecords: function(component, event, helper) {
+        // create var for store record id's for selected checkboxes 
+        
+        var delId = [];
+        var Rating= component.find("rating").get("v.value");
+        var Phone = component.find("name").get("v.value");
+        //alert( component.find("ratingid").get("v.value"));
+        //var selectedIndustry = component.find("ratingid");
+        //alert(selectedIndustry.get("v.value"));
+        //var Phones =component.get("v.Phone");
+        //alert(selectedIndustry);
+        alert('Phone'+Phone.length);
+        if(Rating!=null||Phone!=null)
+        {
+            if((Rating!='Hot'&&Rating!='Cold'&&Rating!='Warm')&&Phone.Length!=10)
+            {
+                
+                alert('Please provide valid values');
+                
+            }
+            else
+            {
+                // get all checkboxes 
+                var getAllId = component.find("boxPack");
+                // If the local ID is unique[in single record case], find() returns the component. not array
+                if(! Array.isArray(getAllId)){
+                    if (getAllId.get("v.value") == true) {
+                        delId.push(getAllId.get("v.text"));
+                    }
+                }else{
+                    // play a for loop and check every checkbox values 
+                    // if value is checked(true) then add those Id (store in Text attribute on checkbox) in delId var.
+                    for (var i = 0; i < getAllId.length; i++) {
+                        if (getAllId[i].get("v.value") == true) {
+                            delId.push(getAllId[i].get("v.text"));
+                        }
+                    }
+                } 
+                var action = component.get('c.EditRecordsOnRatingAndPhone');
+                // pass the all selected record's Id's to apex method 
+                action.setParams({
+                    "lstRecordId": delId,
+                    "Rating":Rating,
+                    "Phone":Phone
+                });
+                action.setCallback(this, function(response) {
+                    //store state of response
+                    var state = response.getState();
+                    if (state === "SUCCESS") {
+                        console.log(state);
+                        if (response.getReturnValue() !=null) {
+                            // if getting any error while delete the records , then display a alert msg/
+                            alert('The following error has occurred. while Editing record-->' + response.getReturnValue());
+                        } else {
+                            console.log('check it--> edit successful');
+                            // this.init(component, event,helper);
+                            // $A.get('e.force:refreshView').fire();
+                        }
+                        $A.get('e.force:refreshView').fire();
+                    }
+                }); 
+                $A.enqueueAction(action); 
+            }
+        }
+        else
+        {
+            alert('Please provide values');
+        }
+        
+        
+        event.preventDefault();
+        
+    },
+    //For Delete selected records 
+    deleteSelected: function(component, event, helper) {
+        alert('in delete');
+        // create var for store record id's for selected checkboxes  
+        var delId = [];
+        // get all checkboxes 
+        var getAllId = component.find("boxPack");
+        // If the local ID is unique[in single record case], find() returns the component. not array
+        if(! Array.isArray(getAllId)){
+            if (getAllId.get("v.value") == true) {
+                delId.push(getAllId.get("v.text"));
+            }
+        }else{
+            // play a for loop and check every checkbox values 
+            // if value is checked(true) then add those Id (store in Text attribute on checkbox) in delId var.
+            for (var i = 0; i < getAllId.length; i++) {
+                if (getAllId[i].get("v.value") == true) {
+                    delId.push(getAllId[i].get("v.text"));
+                }
+            }
+        } 
+        alert(delId);
+        var action = component.get('c.deleteRecords');
+        // pass the all selected record's Id's to apex method 
+        action.setParams({
+            "lstRecordId": delId
+        });
+        action.setCallback(this, function(response) {
+            //store state of response
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                console.log(state);
+                if (response.getReturnValue()!=null) {
+                    // if getting any error while delete the records , then display a alert msg/
+                    alert('The following error has occurred. while Delete record-->' + response.getReturnValue());
+                } else {
+                    console.log('check it--> delete successful');
+                    
+                }
+                $A.get('e.force:refreshView').fire();
+            }
+        });   
+        $A.enqueueAction(action);   
+        
+    },
+    
+    
+    delete:function(component,event,helper){
+    var idx = [];
+    idx=event.target.id;
+    console.log(idx);
+    if(confirm("This communication will be permanently deleted.  Do you want to continue ?"))
+    {
+    component.set("v.deleted", true);
+    var action=component.get("c.deleteRecords");
+    action.setParams({
+    'lstRecordId':idx
+});		
+action.setCallback(this, function(response) {
+    var state = response.getState();
+    if (state === "SUCCESS") {
+        if (response.getReturnValue() != null) {
+            // if getting any error while delete the records , then display a alert msg/
+            alert('The following error has occurred. while Editing record-->' + response.getReturnValue());
+        } else {
+            console.log('check it--> edit successful');
+            
+            this.init(component, event,helper);
+        }                       $A.get('e.force:refreshView').fire();
+    }
+});
+$A.enqueueAction(action);
+}
+
+},
+    Edit:function(component,event,helper){
+        var idx=event.target.id;
+        
+        var editRecordEvent = $A.get("e.force:editRecord");
+        editRecordEvent.setParams({
+            "recordId": idx
+        });
+        editRecordEvent.fire();
+        
+    },
+        EditSelected:function(component,event,helper)
+{
+    // create var for store record id's for selected checkboxes  
+    var delId = [];
+    // get all checkboxes 
+    var getAllId = component.find("boxPack");
+    // If the local ID is unique[in single record case], find() returns the component. not array
+    if(! Array.isArray(getAllId)){
+        if (getAllId.get("v.value") == true) {
+            delId.push(getAllId.get("v.text"));
+        }
+    }else{
+        // play a for loop and check every checkbox values 
+        // if value is checked(true) then add those Id (store in Text attribute on checkbox) in delId var.
+        for (var i = 0; i < getAllId.length; i++) {
+            if (getAllId[i].get("v.value") == true) {
+                delId.push(getAllId[i].get("v.text"));
+            }
+        }
+    } 
+    if(delId!='')
+    {
+        component.set("v.DisplayEdit",true);
+    }
+    else
+    {
+        alert('Please select records to be edited');
+    }
+    
+},
+    DisplayRecordDetails:function(component,event,helper){
+        var idx=event.target.id;
+        //alert(idx);
+        var action=component.get("c.DisplayRecordDetailsMethod");
+        action.setParams({
+            'lstRecordId':idx
+        });		
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                // if storeResponse size is 0 ,display no record found message on screen.
+                console.log(response.getReturnValue());
+                component.set("v.AccountRecord",response.getReturnValue());
+            }
+            
+        });
+        $A.enqueueAction(action);
+    },
+        
+})

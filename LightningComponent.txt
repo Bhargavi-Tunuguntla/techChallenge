@@ -1,0 +1,158 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="DisplayList_CapGeminiFunctionalityClass">
+    <aura:attribute name="AccountList" type="Account[]"/>
+       <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="selectedCount" type="integer" default="0"/>
+    <aura:attribute name="AccountRecord" type="Account" />
+      <aura:attribute name="DisplayEdit" type="Boolean" default="false"/>
+   
+    <div class="slds-page-header">
+      <p class="slds-page-header__title slds-truncate" title="">Account List With Checkbox Action</p>
+      <span class="slds-badge">Selected Contact:{!v.selectedCount}</span>
+          <div class="slds-grid slds-grid--align-end"> 
+         <button class="slds-button slds-button--brand" onclick="{!c.EditSelected}">Edit Accounts</button>
+     &nbsp;&nbsp;&nbsp;
+         <button class="slds-button slds-button--brand" onclick="{!c.deleteSelected}">Delete Accounts</button>
+      </div>
+      
+   </div>
+    <br/>
+    <br/>
+    <aura:if isTrue="{!v.DisplayEdit}"> 
+           <br/>
+        
+    <form class="slds-form--inline slds-table slds-table--bordered slds-table--cell-buffer"> 
+        <br/>
+           <br/>
+           
+  <div class="slds-form-element">
+    <label class="slds-form-element__label" for="Rating">Rating</label>
+    <div class="slds-form-element__control">
+        <ui:inputText  aura:id="rating" placeholder="Rating - Hot/Cold/Warm"/>
+    </div>
+  </div>
+  <div class="slds-form-element">
+    <label class="slds-form-element__label" for="phone">Phone</label>
+    <div class="slds-form-element__control">
+      <ui:inputText  aura:id="name" placeholder="Mobile Number - 10digits"/>
+    </div>
+      <br/>
+  </div>
+         <button class="slds-button slds-button--brand" onclick="{!c.EditRecords}">Edit Records</button>
+     
+        <br/>
+        <br/>
+</form>  
+    </aura:if>
+	<label class="slds-form-element__label" for="search">Details</label>
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                <thead>
+                    <tr class="slds-text-title--caps ">
+                        <th style="width:3.25rem;" class="slds-text-align--right">
+               <div class="slds-form-element">
+                  <div class="slds-form-element__control">
+                     <label class="slds-checkbox">
+                        <!--header checkbox for select all-->
+                        <ui:inputCheckbox aura:id="box3" change="{!c.selectAll}"/>
+                        <span class="slds-checkbox--faux"></span>
+                        <span class="slds-form-element__label text"></span>
+                     </label>
+                  </div>
+               </div>
+            </th>
+                        <th>
+                            <span  title="Delete"><b>Delete</b></span>      
+                        </th>
+                         <th>
+                            <span  title="Edit"><b>Edit</b></span>      
+                        </th>
+                       
+                        <th>       
+                            <span title="Name"><b>Name</b></span>
+                        </th>
+                         <th>       
+                            <span title="Rating"><b>Rating</b></span>
+                        </th>
+                         <th>       
+                            <span title="Phone"><b>Phone</b></span>
+                        </th>
+                      
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.AccountList}" var="EMC">
+                        <tr class="slds-size--1-of-2">
+                              <td scope="row" class="slds-text-align--right" style="width:3.25rem;">
+                  <div class="slds-form-element">
+                     <div class="slds-form-element__control">
+                        <label class="slds-checkbox">
+                           <ui:inputCheckbox text="{!EMC.Id}" aura:id="boxPack" value="" change="{!c.checkboxSelect}"/>
+                           <span class="slds-checkbox--faux"></span>
+                           <span class="slds-form-element__label text"></span>
+                        </label>
+                     </div>
+                  </div> 
+               </td>
+                            <td >
+                                <button type="button" onclick="{!c.delete}" id="{!EMC.Id}">Delete</button>
+                            </td>
+                             <td >
+                                <button type="button" onclick="{!c.Edit}" id="{!EMC.Id}">Edit</button>
+                            </td>
+                            <td >
+                                <div class="Name" style="right: 19px; position: relative !important;" title="{!EMC.Name}"><a href="javascript:void(0)" onclick="{!c.DisplayRecordDetails}" id="{!EMC.Id}">{!EMC.Name}</a></div>
+                            </td>
+                               <td >
+                                <div class="Name" style="right: 19px; position: relative !important;" title="{!EMC.Rating}">{!EMC.Rating}</div>
+                            </td>     
+                             <td >
+                                <div class="Name" style="right: 19px; position: relative !important;" title="{!EMC.Phone}">{!EMC.Phone}</div>
+                            </td>   
+                        </tr>
+                    </aura:iteration>
+                  
+                </tbody>
+            </table>
+    <br/>
+    <br/>
+   <aura:if isTrue="{!not(empty(v.AccountRecord))}">
+        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+        <thead>
+              <tr class="slds-text-title--caps ">
+                        <th>
+                            <span  title="Name"><b>Name</b></span>      
+                        </th>
+                         <th>
+                            <span  title="Rating"><b>Rating</b></span>      
+                        </th>
+                       
+                        <th>       
+                            <span title="Phone"><b>Phone</b></span>
+                        </th>
+                      
+                    </tr>
+            </thead>
+            <tbody>
+                   
+                        <tr class="slds-size--1-of-2">
+                           
+                            <td >
+                                <div class="Name" style="right: 19px; position: relative !important;" title="{!v.AccountRecord.Name}">{!v.AccountRecord.Name}</div>
+                            </td>
+                             <td >
+                                <div class="Name" style="right: 19px; position: relative !important;" title="{!v.AccountRecord.Rating}">{!v.AccountRecord.Rating}</div>
+                            </td>
+                             <td >
+                                <div class="Name" style="right: 19px; position: relative !important;" title="{!v.AccountRecord.Phone}">{!v.AccountRecord.Phone}</div>
+                            </td>
+                                                     
+                        </tr>
+                 
+                  
+                </tbody>
+        </table>
+           <br/>
+    <br/>
+           <br/>
+    <br/>
+</aura:if>
+</aura:component>
