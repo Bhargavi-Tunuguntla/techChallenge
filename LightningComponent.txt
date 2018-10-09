@@ -7,7 +7,7 @@
    
     <div class="slds-page-header">
       <p class="slds-page-header__title slds-truncate" title="">Account List With Checkbox Action</p>
-      <span class="slds-badge">Selected Contact:{!v.selectedCount}</span>
+      <span class="slds-badge">Selected Account:{!v.selectedCount}</span>
           <div class="slds-grid slds-grid--align-end"> 
          <button class="slds-button slds-button--brand" onclick="{!c.EditSelected}">Edit Accounts</button>
      &nbsp;&nbsp;&nbsp;
