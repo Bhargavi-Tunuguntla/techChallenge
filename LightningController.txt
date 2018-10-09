@@ -81,7 +81,7 @@
         //alert(selectedIndustry.get("v.value"));
         //var Phones =component.get("v.Phone");
         //alert(selectedIndustry);
-        alert('Phone'+Phone.length);
+       // alert('Phone'+Phone.length);
         if(Rating!=null||Phone!=null)
         {
             if((Rating!='Hot'&&Rating!='Cold'&&Rating!='Warm')&&Phone.Length!=10)
@@ -145,7 +145,7 @@
     },
     //For Delete selected records 
     deleteSelected: function(component, event, helper) {
-        alert('in delete');
+        //alert('in delete');
         // create var for store record id's for selected checkboxes  
         var delId = [];
         // get all checkboxes 
@@ -164,7 +164,7 @@
                 }
             }
         } 
-        alert(delId);
+        //alert(delId);
         var action = component.get('c.deleteRecords');
         // pass the all selected record's Id's to apex method 
         action.setParams({
